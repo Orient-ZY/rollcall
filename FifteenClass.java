@@ -29,9 +29,10 @@ public class FifteenClass extends JFrame {
 	 */
 	private static final long serialVersionUID = 1L;
 	private String driver = "com.mysql.jdbc.Driver";
+// 	MySQL url
 	private String	url = "jdbc:mysql://localhost:3306/fifteenclass?characterEncoding=utf8&useSSL=false";
 	private String	user = "root";
-	private String	pwd = "ZhouYang0128";
+	private String	pwd = "******";
 	
 	// 定时器flag
 	private Boolean timerFlag = false;
