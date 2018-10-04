@@ -208,6 +208,10 @@ public class FifteenClass extends JFrame {
 				String sid = deleteSid.getText();
 				String name = deleteName.getText();
 				deleteFromRecord(date, sid, name);
+				// 刷新页面
+				statu = "result";
+				flag = false;
+				init();
 			}
 		});
 		
@@ -424,9 +428,6 @@ public class FifteenClass extends JFrame {
 			
 			if (count >= 1) {
 				JOptionPane.showMessageDialog(null, "删除成功！");
-				statu = "result";
-				flag = false;
-				init();
 			}else {
 				JOptionPane.showMessageDialog(null, "删除失败！！！");
 			}
