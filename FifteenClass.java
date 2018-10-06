@@ -3,6 +3,8 @@ package cn.zhyoung.FifteenClass;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.sql.*;
@@ -29,7 +31,6 @@ public class FifteenClass extends JFrame {
 	 */
 	private static final long serialVersionUID = 1L;
 	private String driver = "com.mysql.jdbc.Driver";
-// 	MySQL url
 	private String	url = "jdbc:mysql://localhost:3306/fifteenclass?characterEncoding=utf8&useSSL=false";
 	private String	user = "root";
 	private String	pwd = "******";
@@ -157,25 +158,43 @@ public class FifteenClass extends JFrame {
 		
 		input = new JPasswordField();
 		input.setBounds(200, 100, 100, 30);		
+		input.addKeyListener(new KeyListener() {
+			@Override
+			public void keyTyped(KeyEvent e) {
+				// 回车登录
+				if (e.getKeyChar() == KeyEvent.VK_ENTER) {
+					inputEnter();
+				}
+			}
+			
+			@Override
+			public void keyReleased(KeyEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void keyPressed(KeyEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
 		
 		enter = new JButton("确  认");
 		enter.setBounds(200, 150, 100, 40);
+		enter.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// 点击登录
+				inputEnter();
+				}
+			}
+		);
 		
 		this.add(mainLabel);
 		this.add(input);
 		this.add(enter);
 		
-		enter.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// 退出登录界面
-				flag = false;
-				// 将输入赋值给statu，并对statu进行判断
-				statu = new String(input.getPassword());
-				init();
-				}
-			}
-		);
 	}
 	
 	// 查询界面
@@ -208,7 +227,7 @@ public class FifteenClass extends JFrame {
 				String sid = deleteSid.getText();
 				String name = deleteName.getText();
 				deleteFromRecord(date, sid, name);
-				// 刷新页面
+//				刷新页面
 				statu = "result";
 				flag = false;
 				init();
@@ -243,6 +262,15 @@ public class FifteenClass extends JFrame {
 		this.add(deleteSid);
 		this.add(deleteName);
 		this.add(deleteBtn);
+	}
+	
+	// 
+	void inputEnter() {
+		// 退出登录界面
+		flag = false;
+		// 将输入赋值给statu，并对statu进行判断
+		statu = new String(input.getPassword());
+		init();
 	}
 	
 	// 写入数据库UI
