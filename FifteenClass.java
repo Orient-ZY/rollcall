@@ -7,11 +7,13 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.InputStream;
 import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Properties;
 import java.util.Date;
 
 import javax.swing.JButton;
@@ -24,18 +26,17 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.Timer;
 
+
 public class FifteenClass extends JFrame {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
-	private String driver = "com.mysql.jdbc.Driver";
-	private String	url = "jdbc:mysql://localhost:3306/fifteenclass?characterEncoding=utf8&useSSL=false";
-	private String	user = "root";
-	private String	pwd = "******";
+//      数据库信息
+	private String driver;
+	private String url;
+	private String user;
+	private String pwd;
 	
-	// 定时器flag
+//	定时器flag
 	private Boolean timerFlag = false;
 	private Timer timer = null;
 	
@@ -43,11 +44,11 @@ public class FifteenClass extends JFrame {
 	private List<String> regNames = new ArrayList<String>(); 
 	private List<String> displayNames = new ArrayList<String>();
 	
-	// 点名页面三按钮的状态
+//	点名页面开始、停止按钮的状态
 	private Boolean startFlag = false;
 	private Boolean stopFlag = false;
 
-	// 调试状态
+//	调试状态
 	private Boolean debug = true;
 	
 	private JButton back = null;
@@ -93,7 +94,7 @@ public class FifteenClass extends JFrame {
 		this.setVisible(true);
 	}
 	
-	// 调试工具print
+//	调试工具print
 	void print(String msg, String x) {
 		if (debug) {
 			System.out.println(msg + x);
@@ -115,12 +116,13 @@ public class FifteenClass extends JFrame {
 		}
 	}
 	
-	// 移除所有组件
+//	移除所有组件
 	void removeAllComponent() {
 		this.getContentPane().removeAll();
 	}
 	
 	void init() {
+		initMySQL();
 		removeAllComponent();
 		if (flag) {
 			initOrigin();
@@ -142,7 +144,8 @@ public class FifteenClass extends JFrame {
 			}else if (statu.equals("result")) {
 				initResult();
 			}else {				
-				JOptionPane.showMessageDialog(null, "请输入正确的密码！");	
+//				JOptionPane.showMessageDialog(null, "请输入正确的密码！");	
+				JOptionPane.showMessageDialog(null, new JLabel("<html><font color='red'>请输入正确的密码！</font></html>"));	
 				flag = true;
 				removeAllComponent();
 				init();
@@ -151,7 +154,7 @@ public class FifteenClass extends JFrame {
 		this.repaint();
 	}
 	
-	// 初始UI
+//	初始UI
 	void initOrigin() {
 		mainLabel = new JLabel("输入密码: ");
 		mainLabel.setBounds(140, 100, 80, 30);
@@ -197,7 +200,7 @@ public class FifteenClass extends JFrame {
 		
 	}
 	
-	// 查询界面
+//	查询界面
 	void initResult() {
 //		print("this is searching interface.");
 		back = new JButton("首页");
@@ -205,10 +208,7 @@ public class FifteenClass extends JFrame {
 		back.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-				flag = true;
-				statu = "";
-				init();
+				back2homepage();
 			}
 		});
 		deleteDate = new JTextField("时间", 1);
@@ -264,7 +264,7 @@ public class FifteenClass extends JFrame {
 		this.add(deleteBtn);
 	}
 	
-	// 
+//	登录响应
 	void inputEnter() {
 		// 退出登录界面
 		flag = false;
@@ -273,7 +273,7 @@ public class FifteenClass extends JFrame {
 		init();
 	}
 	
-	// 写入数据库UI
+//	写入数据库UI
 	void initInput() {
 //		this.remove(input);
 //		this.remove(enter);
@@ -283,10 +283,7 @@ public class FifteenClass extends JFrame {
 		back.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-				flag = true;
-				statu = "";
-				init();
+				back2homepage();
 			}
 		});
 		
@@ -301,22 +298,26 @@ public class FifteenClass extends JFrame {
 				String path = regTextField.getText(); 
 				// 读取TXT文件录入数据库
 				try {
-					getRegNames(path);
+					Boolean fromPath = getRegNames(path);
 //					print("This is regNames: ", regNames.get(0));
-					
-					// 写入数据库
-					Boolean succ = write2mysql(regNames);
-					
-					if (succ) {
-						JOptionPane.showMessageDialog(null, "导入成功！");
+					if (fromPath) {
+						// 写入数据库
+						Boolean succ = write2mysql(regNames);
+						
+						if (succ) {
+							JOptionPane.showMessageDialog(null, "导入成功！");
+						}else {
+							JOptionPane.showMessageDialog(null, new JLabel("<html><font color='red'>请检查数据库！！！</font></html>"));
+						}
 					}else {
-						JOptionPane.showMessageDialog(null, "请检查数据库！！！");
+						JOptionPane.showMessageDialog(null, new JLabel("<html><font color='red'>导入失败！！！</font></html>"));
 					}
+					
 					flag = false;
 					statu = "input";
 					init();
 				} catch (Exception e2) {
-					JOptionPane.showMessageDialog(null, "导入失败！！！");
+					JOptionPane.showMessageDialog(null, new JLabel("<html><font color='red'>导入失败！！！</font></html>"));
 					flag = false;
 					statu = "input";
 					init();
@@ -330,7 +331,7 @@ public class FifteenClass extends JFrame {
 		this.add(regBtn);
 	}
 	
-	// 点名UI
+//	点名UI
 	void initCall() {
 //		this.remove(input);
 //		this.remove(enter);
@@ -340,10 +341,7 @@ public class FifteenClass extends JFrame {
 		back.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-				flag = true;
-				statu = "";
-				init();
+				back2homepage();
 				startFlag = false;
 				stopFlag = false;
 				if (timerFlag) {
@@ -408,7 +406,7 @@ public class FifteenClass extends JFrame {
 		this.add(callDisplay);
 	}
 	
-	// 查询record
+//	查询record
 	ArrayList<ArrayList<String>> search(){
 		ArrayList<ArrayList<String>> out = new ArrayList<ArrayList<String>>();
 		
@@ -434,12 +432,13 @@ public class FifteenClass extends JFrame {
 			conn.close();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			JOptionPane.showMessageDialog(null, "查询失败！！！");
+			JOptionPane.showMessageDialog(null, new JLabel("<html><font color='red>查询失败！！！</font></html>"));
 		}
 		
 		return out;
 	}
 	
+//	从记录库中删除信息
 	void deleteFromRecord(String date, String sid, String name) {
 //		print("this is date: ", date);
 //		print("this is sid: ", sid);
@@ -457,16 +456,17 @@ public class FifteenClass extends JFrame {
 			if (count >= 1) {
 				JOptionPane.showMessageDialog(null, "删除成功！");
 			}else {
-				JOptionPane.showMessageDialog(null, "删除失败！！！");
+				JOptionPane.showMessageDialog(null, new JLabel("<html><font color='red'>删除失败！！！</font></html>"));
 			}
 			
 			state.close();
 			conn.close();
 		} catch (Exception e) {
-			JOptionPane.showMessageDialog(null, "删除失败！！！");
+			JOptionPane.showMessageDialog(null, new JLabel("<html><font color='red'>删除失败！！！</font></html>"));
 		}
 	}
 	
+//	记录点名未到
 	void record2mysql() {
 		String rec = callDisplay.getText();
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
@@ -495,7 +495,7 @@ public class FifteenClass extends JFrame {
 			conn.close();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			JOptionPane.showMessageDialog(null, "记录失败！！！");
+			JOptionPane.showMessageDialog(null, new JLabel("<html><font color='red'>记录失败！！！</font></html>"));
 		}
 		
 //		print("this is date: ", recordDate);
@@ -503,6 +503,7 @@ public class FifteenClass extends JFrame {
 //		print("this is recordName: ", recordName);
 	}
 	
+//	点名显示页面
 	void display() {
 		timer = new Timer(10, new ActionListener() {
 			@Override
@@ -517,7 +518,8 @@ public class FifteenClass extends JFrame {
 		});
 	}
 	
-	void getRegNames(String path) {
+//	从文件读取信息
+	Boolean getRegNames(String path) {
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(path));
 			String name = br.readLine();
@@ -525,12 +527,15 @@ public class FifteenClass extends JFrame {
 				regNames.add(name);
 				name = br.readLine();
 			}
+			br.close();
+			return true;
 		} catch (Exception e) {
 			JOptionPane.showMessageDialog(null, "没有此文件：" + path + "！！！请输入正确的文件名");
+			return false;
 		}
-		
 	}
 	
+//	从数据库获取显示名单
 	void getDisplayNames() {
 		try {
 			if (displayNames.size() < 1) {
@@ -564,9 +569,9 @@ public class FifteenClass extends JFrame {
 		}
 	}
 	
+//	将信息信息存入数据库
 	Boolean write2mysql(List<String> inputs) {
 		try {
-			
 			// 注册驱动
 			Class.forName(driver);
 			
@@ -592,14 +597,42 @@ public class FifteenClass extends JFrame {
 			
 			return true;
 		} catch (Exception e) {
-			JOptionPane.showMessageDialog(null, "数据库写入失败！！！");
+			JOptionPane.showMessageDialog(null, new JLabel("<html><font color='red'>数据库写入失败！！！</font></html>"));
 			return false;
+		}
+	}
+	
+//	返回主页面
+	void back2homepage() {
+		flag = true;
+		statu = "";
+		init();
+	}
+	
+//	数据库信息初始化
+	void initMySQL() {
+//		创建properties对象
+		Properties pro = new Properties();
+//		加载文件流
+//		InputStream in = FifteenClass.class.getResourceAsStream("config.properties");
+		InputStream in = FifteenClass.class.getClassLoader().getResourceAsStream("config.properties");
+//		类加载器，加载项目中的资源文件
+		try {
+			pro.load(in);
+			driver = pro.getProperty("driver");
+			url = pro.getProperty("url");
+			user = pro.getProperty("user");
+			pwd = pro.getProperty("pwd");
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			print("pro load failed!");
 		}
 	}
 	
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		new FifteenClass();
+		FifteenClass fifclass = new FifteenClass();
+		
 	}
 
 }
