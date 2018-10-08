@@ -26,7 +26,7 @@ A application for rollcall.
 
 ![homepage](https://user-images.githubusercontent.com/26559141/46590514-704a3380-cae6-11e8-9058-19b5857b0c8f.png)
 
-![import page](https://user-images.githubusercontent.com/26559141/46590514-704a3380-cae6-11e8-9058-19b5857b0c8f.png)
+![import page](https://user-images.githubusercontent.com/26559141/46590548-bc957380-cae6-11e8-86a5-10929e4fbb0d.png)
 
 - Move the roster txt file to the path that same to the app. Input the roster txt file into the textfield and then press the button `导 入`. The success tip will appear if there is no error.
 
@@ -39,5 +39,7 @@ A application for rollcall.
 - This page has 4 main components: startBtn, stopBtn, recordBtn and displayLabel. Press "开 始", the timer then start, and the displayLabel will show the studentID and studentName one by one. Press "停 止", the timer will stop and the displayLabel will only show one student info. Press "记 录", the student info in the displayLabel will record to database.
 
 ## The result page
+
+![result page](https://user-images.githubusercontent.com/26559141/46591549-033a9c00-caee-11e8-92eb-391255ed0c11.png)
 
 This page would appear while inputing the password "result". It shows the info who was recorded.
