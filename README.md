@@ -43,3 +43,5 @@ A application for rollcall.
 ![result page](https://user-images.githubusercontent.com/26559141/46591549-033a9c00-caee-11e8-92eb-391255ed0c11.png)
 
 This page would appear while inputing the password "result". It shows the info who was recorded.
+
+*If you want to delete someone's info, you can input the info and then press the button "删除".*
