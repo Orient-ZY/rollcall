@@ -30,7 +30,6 @@ import javax.swing.Timer;
 public class FifteenClass extends JFrame {
 
 	private static final long serialVersionUID = 1L;
-//      数据库信息
 	private String driver;
 	private String url;
 	private String user;
@@ -446,14 +445,21 @@ public class FifteenClass extends JFrame {
 		try {
 			Class.forName(driver);
 			Connection conn = DriverManager.getConnection(url, user, pwd);
-			String sql = "DELETE FROM record WHERE time=? and sid=? and name=?";
-			PreparedStatement state = conn.prepareStatement(sql);
+			String recordSql = "DELETE FROM record WHERE time=? and sid=? and name=? LIMIT 1";
+			PreparedStatement state = conn.prepareStatement(recordSql);
 			state.setString(1, date);
 			state.setString(2, sid);
 			state.setString(3, name);
-			int count = state.executeUpdate();
+			int recordCount = state.executeUpdate();
 			
-			if (count >= 1) {
+			String regSql = "DELETE FROM reg WHERE uid>61 and sid=? and name=? ORDER BY uid LIMIT 1";
+			state = conn.prepareStatement(regSql);
+			state.setString(1, sid);
+			state.setString(2, name);
+			int regCount = state.executeUpdate();
+			
+			
+			if (recordCount >= 1 && regCount == 1) {
 				JOptionPane.showMessageDialog(null, "删除成功！");
 			}else {
 				JOptionPane.showMessageDialog(null, new JLabel("<html><font color='red'>删除失败！！！</font></html>"));
@@ -480,14 +486,20 @@ public class FifteenClass extends JFrame {
 		try {
 			Class.forName(driver);
 			Connection conn = DriverManager.getConnection(url, user, pwd);
-			String sql = "INSERT INTO record VALUES(?, ?, ?)";
-			PreparedStatement state = conn.prepareStatement(sql);
+			String recordSql = "INSERT INTO record VALUES(?, ?, ?)";
+			PreparedStatement state = conn.prepareStatement(recordSql);
 			state.setString(1, recordDate);
 			state.setString(2, recordSid);
 			state.setString(3, recordName);
-			int count = state.executeUpdate();
+			int recordCount = state.executeUpdate();
 			
-			if (count == 1) {
+			String regSql = "INSERT INTO reg(sid, name) VALUES(?, ?)";
+			state = conn.prepareStatement(regSql);
+			state.setString(1, recordSid);
+			state.setString(2, recordName);
+			int regCount = state.executeUpdate();
+			
+			if (recordCount == 1 && regCount == 1) {
 				JOptionPane.showMessageDialog(null, "记录成功！");
 			}
 			
